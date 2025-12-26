@@ -14,51 +14,68 @@ const gettopcheap = (req, res, next) => {
 const getalltours = async (req, res) => {
   try {
     const queryparams = req.query;
-    console.log(queryparams);
-    const obj = Object.assign({}, queryparams);
+
+    const obj = { ...queryparams };
     const excludeFields = ['limit', 'page', 'sort', 'fields'];
-    excludeFields.forEach((ele) => delete obj[ele]);
-    let query = Tour.find(obj);
+    excludeFields.forEach((el) => delete obj[el]);
+
+    const filter = {};
+    const allowedFields = ['price', 'duration', 'difficulty'];
+
+    allowedFields.forEach((field) => {
+      if (
+        obj[field] &&
+        (typeof obj[field] === 'string' || typeof obj[field] === 'number')
+      ) {
+        filter[field] = obj[field];
+      }
+    });
+
+    if (obj.duration?.gte) {
+      filter.duration = {
+        ...(filter.duration || {}),
+        $gte: Number(obj.duration.gte),
+      };
+    }
+
+    if (obj.duration?.lte) {
+      filter.duration = {
+        ...(filter.duration || {}),
+        $lte: Number(obj.duration.lte),
+      };
+    }
+
+    let query = Tour.find(filter);
 
     if (queryparams.sort) {
       const sortBy = queryparams.sort.split(',').join(' ');
-      query.sort(sortBy);
+      query = query.sort(sortBy);
     }
 
     if (queryparams.fields) {
       const fields = queryparams.fields.split(',').join(' ');
-      query.select(fields);
+      query = query.select(fields);
     } else {
-      query.select('-__v');
+      query = query.select('-__v');
     }
 
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 10;
+    const page = queryparams.page * 1 || 1;
+    const limit = queryparams.limit * 1 || 10;
     const skip = (page - 1) * limit;
 
     query = query.skip(skip).limit(limit);
 
-    if (req.query.page) {
-      const total = await Tour.countDocuments();
-      if (skip >= total) {
-        return res.status(404).json({
-          status: 'failure',
-          message: 'This page does not exist',
-        });
-      }
-    }
-
     const tours = await query;
 
     res.status(200).json({
-      status: 'Success',
+      status: 'success',
       results: tours.length,
       data: tours,
     });
   } catch (err) {
     res.status(500).json({
       status: 'failure',
-      error: err,
+      error: err.message,
     });
   }
 };

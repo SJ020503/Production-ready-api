@@ -2,6 +2,27 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { promisify } = require('util');
+const { body, validationResult } = require('express-validator');
+
+exports.validateLogin = [
+  body('email').isEmail().withMessage('Invalid email'),
+
+  body('password')
+    .isString()
+    .withMessage('Password must be a string')
+    .isLength({ min: 8 }),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: 'fail',
+        errors: errors.array(),
+      });
+    }
+    next();
+  },
+];
 
 /* =========================
    Helper: sign JWT
