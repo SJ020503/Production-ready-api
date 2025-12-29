@@ -69,17 +69,14 @@ This project goes beyond a basic CRUD API by focusing on **scalability, correctn
 
 ## Architecture Overview
 
-Client
-|
-v
-Nginx (Reverse Proxy / Load Balancer)
-|
-v
-Node.js API (Multiple Instances)
-| |
-| └── Redis (Distributed Rate Limiting)
-|
+Client  
+↓  
+Nginx (Reverse Proxy / Load Balancer)  
+↓  
+Node.js API (Multiple Instances)  
+├── Redis (Distributed Rate Limiting)  
 └── MongoDB Atlas (Persistent Storage)
+
 
 ## Project Structure
 
