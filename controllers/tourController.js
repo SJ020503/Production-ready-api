@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const Tour = require(path.join(__dirname, '../models/tourModel.js'));
+const os = require('os');
 
 const gettopcheap = (req, res, next) => {
   req.query = {
@@ -67,9 +68,12 @@ const getalltours = async (req, res) => {
 
     const tours = await query;
 
+    res.set('X-Handled-By', require('os').hostname());
+
     res.status(200).json({
       status: 'success',
       results: tours.length,
+      handledBy: os.hostname(),
       data: tours,
     });
   } catch (err) {

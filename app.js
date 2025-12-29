@@ -7,8 +7,9 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 const app = express();
+app.set('trust proxy', true);
 
-app.use(helmet()); // http only headers
+app.use(helmet()); // Uses multiple middlewares for security
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));

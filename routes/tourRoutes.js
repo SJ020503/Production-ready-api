@@ -17,7 +17,7 @@ router
     '/',
     authController.protect,
     tokenBucketLimiter({
-      capacity: 2,
+      capacity: 9,
       refillRate: 0.01,
     }),
     tourController.getalltours
