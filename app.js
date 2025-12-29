@@ -4,17 +4,10 @@ const userRouter = require(`${__dirname}/routes/userRoutes.js`);
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 100,
-});
 
 const app = express();
 
-app.use(limiter); //rate limting
 app.use(helmet()); // http only headers
 
 if (process.env.NODE_ENV === 'development') {

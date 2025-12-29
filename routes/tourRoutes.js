@@ -1,4 +1,5 @@
 const express = require('express');
+const tokenBucketLimiter = require('../middlewares/tokenBucketLimiter');
 const path = require('path');
 const tourController = require(path.join(
   __dirname,
@@ -12,7 +13,15 @@ const authController = require(path.join(
 const router = express.Router();
 
 router
-  .get('/', authController.protect, tourController.getalltours)
+  .get(
+    '/',
+    authController.protect,
+    tokenBucketLimiter({
+      capacity: 2,
+      refillRate: 0.01,
+    }),
+    tourController.getalltours
+  )
   .get('/top5-cheap', tourController.gettopcheap, tourController.getalltours)
   .post('/', tourController.posttour)
   .get('/:id', tourController.gettourbyid)
